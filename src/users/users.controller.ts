@@ -11,9 +11,11 @@ import {
   Res,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/users.dto';
+import { UpdateUserDto } from './dto/users.dto';
 
-import { ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UsersService } from './users.service';
+import { User } from '@prisma/client';
 
 @ApiTags('Users')
 @Controller('users')
@@ -21,8 +23,21 @@ export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
   @Get()
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  async getUsersList() {}
+  async getUsersList(@Req() req: any, @Res() res: any) {
+    return res.status(HttpStatus.OK).json(await this.userService.getUserList());
+  }
+
+  @ApiParam({ name: 'userId', required: true })
+  @Get('/:userId')
+  async getUserInfo(
+    @Req() req: any,
+    @Res() res: any,
+    @Param('userId') userId: string,
+  ) {
+    return res
+      .status(HttpStatus.OK)
+      .json(await this.userService.getUserById(userId));
+  }
 
   @Post()
   async createUser(
@@ -34,29 +49,18 @@ export class UsersController {
       .status(HttpStatus.CREATED)
       .json(await this.userService.createUser(body));
   }
+  @Patch(':id')
+  async updateUser(
+    @Param('id') userId: string,
+    @Body() userData: UpdateUserDto,
+  ): Promise<User> {
+    return this.userService.updateUser(userId, userData);
+  }
 
-  @Delete('/:userId')
-  async deleteUser(
-    @Req() req: any,
-    @Res() res: any,
-    @Param('userId') userId: string,
-  ) {
-    console.log(userId);
+  @Delete('/:id')
+  async delete(@Req() req: any, @Res() res: any, @Param('id') userId: string) {
     return res
       .status(HttpStatus.OK)
       .json(await this.userService.deleteUser(userId));
   }
-
-  @ApiParam({ name: 'id', required: true })
-  @Patch('/:userId')
-  async updateUser(
-    @Req() req: any,
-    @Res() res: any,
-    @Param('userId') userId: any,
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-  ) {}
-
-  @Post('/animals/:id')
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  async addNewPet() {}
 }

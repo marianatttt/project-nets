@@ -34,3 +34,11 @@ export class CreateUserDto {
   @IsOptional()
   status: boolean;
 }
+
+export class UpdateUserDto {
+  name?: string;
+  city?: string;
+  email?: string;
+  age?: number;
+  status?: boolean;
+}
