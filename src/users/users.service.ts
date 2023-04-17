@@ -17,6 +17,7 @@ export class UsersService {
         email: userData.email,
         age: userData.age,
         status: userData.status,
+        avatar: userData.avatar,
       },
     });
   }
@@ -34,6 +35,7 @@ export class UsersService {
     return this.prismaService.user.findUnique({
       where: { id: Number(userId) },
       select: {
+        id: true,
         name: true,
         email: true,
       },
